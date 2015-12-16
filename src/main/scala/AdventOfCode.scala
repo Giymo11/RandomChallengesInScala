@@ -7,7 +7,19 @@ import ammonite.ops._
 object AdventOfCode {
 
   def main(args: Array[String]) {
-    day1()
+    day2()
+  }
+
+  def day2() = {
+
+    val input = read.lines ! cwd / 'AdventOfCode / 'day2
+    //val input = List("2x3x4") // for testing putposes
+    val intermediate = input map (_.split('x') map (_.toInt))
+    val result = intermediate map (x => List(x(0) * x(1), x(1) * x(2), x(2) * x(0))) map (x => 2 * x.sum + x.min)
+    println(result.sum)
+
+    val result2 = intermediate map (x => x.sorted) map (x => 2 * (x(0) + x(1)) + x.product)
+    println(result2.sum)
   }
 
   def day1() {
