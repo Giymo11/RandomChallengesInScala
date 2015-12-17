@@ -1,4 +1,6 @@
 
+import java.security.MessageDigest
+
 import ammonite.ops._
 
 /**
@@ -7,7 +9,31 @@ import ammonite.ops._
 object AdventOfCode {
 
   def main(args: Array[String]) {
-    day3()
+    day4()
+  }
+
+  def day4() = {
+
+    val messageDigest = MessageDigest.getInstance("MD5")
+
+    def md5(s: String): Array[Byte] = {
+      messageDigest.digest(s.getBytes)
+    }
+
+    def crackit(secret: String, number: Int): Int = {
+      val res = md5(secret + number)
+
+      if (number % 10000 == 0) println(number)
+
+      if (res(0) == 0 && res(1) == 0 && res(2) == 0) {
+        println(res.map(x => f"$x%02x").mkString(""))
+        return number
+      }
+
+      crackit(secret, number + 1)
+    }
+
+    println(crackit("bgvyzdsv", 0))
   }
 
   def day3() = {
