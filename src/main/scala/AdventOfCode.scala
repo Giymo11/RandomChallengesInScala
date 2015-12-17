@@ -9,10 +9,50 @@ import ammonite.ops._
 object AdventOfCode {
 
   def main(args: Array[String]) {
-    day5()
+    day6()
+  }
+
+  def day6() = {
+
+    val input = read.lines! cwd/'AdventOfCode/'day6
+    //val input = Seq("turn on 0,0 through 999,999", "toggle 0,0 through 999,0")
+
+    var grid = Array.tabulate[Boolean](1000, 1000)((row, column) => false)
+
+    def set(startX: Int, startY: Int, stopX: Int, stopY: Int, value: Boolean) = {
+      for(row <- startX to stopX)
+        for(col <- startY to stopY)
+          grid(row)(col) = value
+    }
+
+    def toggle(startX: Int, startY: Int, stopX: Int, stopY: Int) = {
+      for(row <- startX to stopX)
+        for(col <- startY to stopY)
+          grid(row)(col) = !grid(row)(col)
+    }
+
+    input.foreach(string => {
+      val split = string.dropWhile(!_.isDigit).split(',')
+
+      val startX = split(0).toInt
+      val startY = split(1).takeWhile(_.isDigit).toInt
+      val stopX = split(1).dropWhile(_.isDigit).dropWhile(!_.isDigit).toInt
+      val stopY = split(2).toInt
+
+      string match {
+        case s if string.startsWith("turn on") => set(startX, startY, stopX, stopY, value = true)
+        case s if string.startsWith("turn off") => set(startX, startY, stopX, stopY, value = false)
+        case s if string.startsWith("toggle") => toggle(startX, startY, stopX, stopY)
+      }
+    })
+
+    val lit = grid.map(array => array.count(bool => bool)).sum
+    println(lit)
+
   }
 
   def day5() = {
+
     val input = read.lines! cwd/'AdventOfCode/'day5
 
     //val input = Seq("ugknbfddgicrmopn", "jchzalrnumimnmhp", "haegwjzuvuyypxyu", "dvszwmarrgswjxmb") // for first
