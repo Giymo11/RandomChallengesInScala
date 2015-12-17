@@ -17,18 +17,12 @@ object AdventOfCode {
     val input = read.lines! cwd/'AdventOfCode/'day6
     //val input = Seq("turn on 0,0 through 999,999", "toggle 0,0 through 999,0")
 
-    var grid = Array.tabulate[Boolean](1000, 1000)((row, column) => false)
+    var grid = Array.tabulate[Int](1000, 1000)((row, column) => 0)
 
-    def set(startX: Int, startY: Int, stopX: Int, stopY: Int, value: Boolean) = {
+    def add(startX: Int, startY: Int, stopX: Int, stopY: Int, value: Int) = {
       for(row <- startX to stopX)
-        for(col <- startY to stopY)
-          grid(row)(col) = value
-    }
-
-    def toggle(startX: Int, startY: Int, stopX: Int, stopY: Int) = {
-      for(row <- startX to stopX)
-        for(col <- startY to stopY)
-          grid(row)(col) = !grid(row)(col)
+        for(col <- startY to stopY) if(grid(row)(col) > 0 || value > 0)
+          grid(row)(col) = grid(row)(col) + value
     }
 
     input.foreach(string => {
@@ -40,13 +34,13 @@ object AdventOfCode {
       val stopY = split(2).toInt
 
       string match {
-        case s if string.startsWith("turn on") => set(startX, startY, stopX, stopY, value = true)
-        case s if string.startsWith("turn off") => set(startX, startY, stopX, stopY, value = false)
-        case s if string.startsWith("toggle") => toggle(startX, startY, stopX, stopY)
+        case s if string.startsWith("turn on") => add(startX, startY, stopX, stopY, 1)
+        case s if string.startsWith("turn off") => add(startX, startY, stopX, stopY, -1)
+        case s if string.startsWith("toggle") => add(startX, startY, stopX, stopY, 2)
       }
     })
 
-    val lit = grid.map(array => array.count(bool => bool)).sum
+    val lit = grid.flatten.sum
     println(lit)
 
   }
