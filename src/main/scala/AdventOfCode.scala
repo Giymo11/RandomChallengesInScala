@@ -9,16 +9,51 @@ import ammonite.ops._
 object AdventOfCode {
 
   def main(args: Array[String]) {
-    day4()
+    day5()
+  }
+
+  def day5() = {
+    val input = read.lines! cwd/'AdventOfCode/'day5
+
+    //val input = Seq("ugknbfddgicrmopn", "jchzalrnumimnmhp", "haegwjzuvuyypxyu", "dvszwmarrgswjxmb") // for first
+    //val input = Seq("qjhvhtzxzqqjkmpb", "xxyxx", "uurcxstgmygtbstg", "ieodomkazucvgmuy") // for second
+
+    val badSubstrings = Seq("ab", "cd", "pq", "xy")
+    val vowels = Seq('a', 'e', 'i', 'o', 'u')
+
+    val noBad = input.filterNot(string => string.sliding(2).map(window => badSubstrings.contains(window)).reduce(_ || _))
+    val moreDouble = noBad.filter(string => string.sliding(2).map(window => window(0) == window(1)).reduce(_ || _))
+    val threeVowels = moreDouble.filter(string => string.count(char => vowels.contains(char)) >= 3)
+
+    //println(noBad)
+    //println(moreDouble)
+    //println(threeVowels)
+    println(threeVowels.size)
+
+    val oneLetterBetween = input.filter(string => string.sliding(3).map(window => window(0) == window(2)).reduce(_ || _))
+    val hasDoublePair = oneLetterBetween.filter(string => {
+      def checkPair(string: String): Boolean = {
+        if(string.length <= 3) return false
+
+        val (pair, tail) = string.splitAt(2)
+        if(tail.contains(pair)) return true
+
+        checkPair(string.tail)
+      }
+      checkPair(string)
+    })
+
+    //println(input)
+    //println(oneLetterBetween)
+    //println(hasDoublePair)
+    println(hasDoublePair.size)
   }
 
   def day4() = {
 
     val messageDigest = MessageDigest.getInstance("MD5")
 
-    def md5(s: String): Array[Byte] = {
-      messageDigest.digest(s.getBytes)
-    }
+    def md5(s: String): Array[Byte] = messageDigest.digest(s.getBytes)
 
     def crackit(secret: String, number: Int): Int = {
       val res = md5(secret + number)
@@ -38,7 +73,7 @@ object AdventOfCode {
 
   def day3() = {
 
-    val input = read ! cwd / 'AdventOfCode / 'day3
+    val input = read! cwd/'AdventOfCode/'day3
     //val input = "^v^v^v^v^v"
 
     case class Coordinate(x: Int, y: Int)
@@ -59,7 +94,6 @@ object AdventOfCode {
                                              santaMap: Map[Coordinate, Int], santaPos: Coordinate,
                                              roboMap: Map[Coordinate, Int], roboPos: Coordinate
                                             ): Seq[Map[Coordinate, Int]] = input match {
-
       case x :: xs =>
 
         val deltaX = if (x == '^') 1 else if (x == 'v') -1 else 0
@@ -91,10 +125,10 @@ object AdventOfCode {
 
   def day2() = {
 
-    val input = read.lines ! cwd / 'AdventOfCode / 'day2
+    val input = read.lines! cwd/'AdventOfCode/'day2
     //val input = List("2x3x4") // for testing putposes
     val intermediate = input map (_.split('x') map (_.toInt))
-    val result = intermediate map (x => List(x(0) * x(1), x(1) * x(2), x(2) * x(0))) map (x => 2 * x.sum + x.min)
+    val result = intermediate map (x => List(x(0)*x(1), x(1)*x(2), x(2)*x(0))) map (x => 2 * x.sum + x.min)
     println(result.sum)
 
     val result2 = intermediate map (x => x.sorted) map (x => 2 * (x(0) + x(1)) + x.product)
