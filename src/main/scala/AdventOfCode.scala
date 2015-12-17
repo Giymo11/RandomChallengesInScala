@@ -7,7 +7,60 @@ import ammonite.ops._
 object AdventOfCode {
 
   def main(args: Array[String]) {
-    day2()
+    day3()
+  }
+
+  def day3() = {
+
+    val input = read ! cwd / 'AdventOfCode / 'day3
+    //val input = "^v^v^v^v^v"
+
+    case class Coordinate(x: Int, y: Int)
+
+    def navigate(input: List[Char], map: Map[Coordinate, Int], position: Coordinate): Map[Coordinate, Int] = input match {
+      case x :: xs =>
+        val deltaX = if (x == '^') 1 else if (x == 'v') -1 else 0
+        val deltaY = if (x == '>') 1 else if (x == '<') -1 else 0
+        navigate(xs, map + (position -> (map.getOrElse(position, 0) + 1)), Coordinate(position.x + deltaX, position.y + deltaY))
+      case _ => map
+    }
+
+    val map = navigate(input.toList, Map[Coordinate, Int](Coordinate(0, 0) -> 1), Coordinate(0, 0))
+    //println(map)
+    println(map.values.size)
+
+    def navigateWithALittleHelpFromMyFriends(input: List[Char], santasTurn: Boolean,
+                                             santaMap: Map[Coordinate, Int], santaPos: Coordinate,
+                                             roboMap: Map[Coordinate, Int], roboPos: Coordinate
+                                            ): Seq[Map[Coordinate, Int]] = input match {
+
+      case x :: xs =>
+
+        val deltaX = if (x == '^') 1 else if (x == 'v') -1 else 0
+        val deltaY = if (x == '>') 1 else if (x == '<') -1 else 0
+
+        if (santasTurn) {
+          val newSantaPos = Coordinate(santaPos.x + deltaX, santaPos.y + deltaY)
+          navigateWithALittleHelpFromMyFriends(xs, !santasTurn,
+            santaMap + (newSantaPos -> (santaMap.getOrElse(newSantaPos, 0) + 1)), newSantaPos,
+            roboMap, roboPos)
+        }
+        else {
+          val newRoboPos = Coordinate(roboPos.x + deltaX, roboPos.y + deltaY)
+          navigateWithALittleHelpFromMyFriends(xs, !santasTurn,
+            santaMap, santaPos,
+            roboMap + (newRoboPos -> (roboMap.getOrElse(newRoboPos, 0) + 1)), newRoboPos)
+        }
+
+      case _ => Seq(santaMap, roboMap)
+    }
+
+    val maps = navigateWithALittleHelpFromMyFriends(input.toList, santasTurn = true,
+      Map[Coordinate, Int](Coordinate(0, 0) -> 1), Coordinate(0, 0),
+      Map[Coordinate, Int](Coordinate(0, 0) -> 1), Coordinate(0, 0))
+
+    //println(maps)
+    println(maps.reduce(_ ++ _).values.size)
   }
 
   def day2() = {
